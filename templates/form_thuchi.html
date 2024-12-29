@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <form action="/api/TC/{{thuchi['func']}}/apply" method="post">
+    <title>{{thuchi['title']}}</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_form_thuchi.css') }}">
+</head>
+<body>
+    <div class="form-container">
+    <form id="{{thuchi['form_name']}}">
+        <h2>{{thuchi['title']}}</h2>
+        <label for="stt">STT:</label>
+        <input type="text" id="stt" name="STT" onchange="updateFormSTT()" required value="{{thuchi['stt']}}"><br>
+        <label for="idDichVu">ID dịch vụ:</label>
+        <input type="text" id="idDichVu" name="ID_DICH_VU" required onchange="updatePrice()"><br>
+        <label for="tenDichVu">Tên dịch vụ:</label>
+        <input type="text" id="tenDichVu" name="TEN_DICH_VU" readonly><br>
+        <label for="idHo">ID hộ:</label>
+        <input type="text" id="idHo" name="ID_HO" required onchange="updatePrice()"><br>
+        <label for="soLuong">Số lượng:</label>
+        <input type="number" id="soLuong" name="SO_LUONG" min="0" step="1" required onchange="updatePrice()"><br>
+        <label for="giaTien">Giá tiền:</label>
+        <input type="number" id="giaTien" name="GIA_TIEN" min="0" step="1000" readonly><br>
+        <label for="daThu">Đã thu:</label>
+        <input type="number" id="daThu" name="DA_THU" min="0" step="1000" required><br>
+        <label for="ngayThu">Ngày thu:</label>
+        <input type="date" id="ngayThu" name="ngay_thu" required value="{{ today }}"><br>
+        <button type="submit">Gửi</button>
+    </form>
+    <script src="{{ url_for('static', filename='js/form_thuchi.js') }}"></script>
+  </form>
+      <!-- <button type="button" onclick="setDefault()">Reset to Default</button> -->
+  </div>  
+  <script>
+    if ("{{thuchi["func"]}}" === "add") {
+      document.getElementById("stt").readOnly = true;
+    }
+    function setDefault() {
+        document.getElementById('stt').value = "{{thuchi['stt']}}";
+        document.getElementById('ngaySuaDoi').value = "{{ today }}";
+    }
+    function updatePrice() {
+        var idDichVu = document.getElementById('idDichVu').value;
+        var idHo = document.getElementById('idHo').value;
+        var soLuong = document.getElementById('soLuong').value;
+        if(idDichVu && idHo) {
+          fetch(`/api/getPrice?idDichVu=${idDichVu}&idHo=${idHo}&soLuong=${soLuong}`)
+              .then(response => {
+                  if (!response.ok) {
+                    return response.json().then(errorData => {
+                                                        // Throw an error with the message from your Flask application
+                                                        throw new Error(errorData.error);
+                                                    });
+                  }
+                  return response.json();
+              })
+              .then(data => {
+                  document.getElementById('giaTien').value = data.price * data.soLuong; // Update the price
+                document.getElementById('tenDichVu').value = data.name; // Update the name
+                document.getElementById('soLuong').value = data.soLuong;
+                if ("{{thuchi['func']}}"=='add'){
+                  document.getElementById('stt').value = data.stt; // Update the index
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                alert(error.message);
+                document.getElementById('giaTien').value = '';
+                document.getElementById('idDichVu').value = '';
+                document.getElementById('tenDichVu').value = '';
+                document.getElementById('idHo').value = '';
+                document.getElementById('stt').value = '';
+                document.getElementById('soLuong').value = '';
+              });
+          }
+    }
+
+    function updateFormSTT() {
+      if ("{{thuchi['func']}}"=='update'){
+        var stt = document.getElementById('stt').value;
+        fetch(`/api/getFormSTT?stt=${stt}`)
+            .then(response => {
+                if (!response.ok) {
+                  return response.json().then(errorData => {
+                                                        // Throw an error with the message from your Flask application
+                                                        throw new Error(errorData.error);
+                                                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                
+                document.getElementById('giaTien').value = data.giaTien; // Update the price
+                document.getElementById('idDichVu').value = data.idDichVu;
+                document.getElementById('idHo').value = data.idHo;
+                document.getElementById('soLuong').value = data.soLuong;
+                // document.getElementById('ngayThu').value = data.ngay_thu;   // don't need ngay thu
+                document.getElementById('daThu').value = data.daThu;
+              document.getElementById('tenDichVu').value = data.tenDichVu;
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert(error.message);
+              document.getElementById('giaTien').value = '';
+              document.getElementById('idDichVu').value = '';
+              document.getElementById('tenDichVu').value = '';
+              document.getElementById('idHo').value = '';
+              document.getElementById('stt').value = '';
+              document.getElementById('soLuong').value = '';
+            });
+          }
+    }
+  </script>
+</body>
+</html>

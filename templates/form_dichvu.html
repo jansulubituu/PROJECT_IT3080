@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <form action="/api/DV/{{dichvu['func']}}/apply" method="post">
+    <title>{{dichvu['title']}}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_form_dichvu.css') }}">
+</head>
+<body>
+  <div class="form-container">
+    <form id="service-history-form">
+        <h2>{{dichvu['title']}}</h2>
+        <label for="stt">STT:</label>
+        <input type="number" id="stt" name="stt" readonly value="{{dichvu['stt']}}"><br>
+        <label for="idDichVu">ID dịch vụ:</label>
+        <input type="text" id="idDichVu" name="ID_DICH_VU" value="{{dichvu['idDichVu']}}" onchange="updateFormID_DICH_VU()"><br>
+        <label for="tenDichVu">Tên dịch vụ:</label>
+        <input type="text" id="tenDichVu" name="TEN_DICH_VU" required><br>
+        <label for="donGia">Đơn giá:</label>
+        <input type="number" id="donGia" name="don_gia" min="0" step="1000"><br>
+        <label for="tinhTrang">Trạng thái:</label>
+        <select id="batBuoc" name="BAT_BUOC">
+            <option value="tuNguyen">Tự nguyện</option>
+            <option value="batBuoc">Bắt buộc</option>
+        </select><br>
+        <label for="tinhTheoDienTich">Tính theo diện tích:</label>
+        <select id="tinh" name="TINH">
+          <option value="Yes">Có</option>
+          <option value="No">Không</option>
+        </select><br>
+        <label>Hiện hành</label>
+        <select id="avail" name="HIEN_HANH">
+          <option value="Yes">Có</option>
+          <option value="No">Không</option>
+        </select>
+        <label for="ngaySuaDoi">Ngày sửa đổi:</label>
+        <input type="date" id="ngaySuaDoi" name="NGAY_SUA_DOI" required value="{{ today }}"><br>
+        <button type="submit">Submit</button>
+    </form>
+    <!-- <button type="button" onclick="setDefault()">Reset to Default</button> -->
+  </div>
+    <script>
+      if (String({{dichvu['idDichVu']}}) === "") {
+        document.getElementById("idDichVu").required = true;
+      }
+      else {
+        document.getElementById("idDichVu").readOnly = true;
+      }
+      function setDefault() {
+          document.getElementById('stt').value = "{{dichvu['stt']}}";
+          document.getElementById('idDichVu').value = "{{dichvu['idDichVu']}}";
+          document.getElementById('ngaySuaDoi').value = "{{ today }}";
+      }
+      function updateFormID_DICH_VU() {
+        if ("{{dichvu['func']}}"=='update'){
+          var id_dv = document.getElementById('idDichVu').value;
+          fetch(`/api/getFormID_DICH_VU?idDichVu=${id_dv}`)
+              .then(response => {
+                  if (!response.ok) {
+                    return response.json().then(errorData => {
+                                                        // Throw an error with the message from your Flask application
+                                                        throw new Error(errorData.error);
+                                                    });
+                  }
+                  return response.json();
+              })
+              .then(data => {
+                  document.getElementById('tenDichVu').value = data.tenDichVu;
+                  document.getElementById('donGia').value = data.donGia;
+                  document.getElementById('batBuoc').value = data.batBuoc;
+                  document.getElementById('tinh').value = data.tinh;
+                  document.getElementById('avail').value = data.avail;
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                alert(error.message);
+                document.getElementById('tenDichVu').value = '';
+                document.getElementById('donGia').value = '';
+                document.getElementById('batBuoc').value = '';
+                document.getElementById('idDichVu').value = '';
+                document.getElementById('tinh').value = '';
+                document.getElementById('avail').value = '';
+              });
+            }
+      }
+  </script>
+</body>
+</html>

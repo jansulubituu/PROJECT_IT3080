@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>QLCC</title>
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/style_home.css') }}">
+  </head>
+  <body>
+
+    <header>
+        <h1 class="BlueMoon">QLCC</h1>
+        <nav class ="navigation">
+    
+            <a href="#">Về chúng tôi</a>
+            <a href="#">Dịch vụ</a>
+            <b href="#">Liên hệ</b>
+
+        <button class="btnLogin-popup">Đăng nhập</button>
+       
+      
+        </nav>
+    </header>
+
+    <div class="wrapper">
+        <span class="icon-close"><ion-icon name="close"></ion-icon></span>
+
+        <div class="form-box login">
+            <h2>Đăng nhập</h2>
+                   
+                <img src="{{ url_for('static', filename='img/logo.svg')}}" alt="logo" class="logo">
+
+                <button class="btn" onclick="location.href='/login'">Đăng nhập</button>
+                <div class="login-register">
+                    <p>Chưa có tài khoản?<a href="#"
+                    class="register-link">Đăng kí</a></p>
+                </div>
+        </div>
+
+        <div class="form-box register">
+            <h2>Đăng kí tài khoản</h2>
+            <form action="#">
+               
+                <div class="input-box">
+                    <span class="icon"><ion-icon name="person-circle"></ion-icon></span>
+                    <input type="username" required>
+                    <label>Tên tài khoản</label>
+                </div>
+                <div class="input-box">
+                    <span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
+                    <input type="password" required>
+                    <label>Mật khẩu</label>
+                </div>
+                <div class="remember-forgot">
+                    <label><input type="checkbox">
+                    Đồng ý với mọi điều khoản</label></div>
+                    
+                    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">
+                        <button class="btn btn-primary" type="button">Send request
+                    </button>
+                <div class="login-register">
+                    <p>Đã có tài khoản?<a href="#"
+                    class="login-link">Đăng nhập</a></p>
+                </div>
+            </form>
+        </div>
+
+    </div>
+    <script src="{{ url_for('static', filename='js/script_home.js') }}"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  </body>
+</html>

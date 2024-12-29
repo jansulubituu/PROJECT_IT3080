@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<form action="/api/RP/{{report['func']}}/apply" method="post">
+<head>
+    <title>{{report['title']}}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_form_report.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h2>{{report['title']}}</h2>
+      <div class="form-group">
+        <label for="stt">STT</label>
+        <input type="text" id="stt" name="STT" required value="{{report['stt']}}" onchange="updateFormSTT()">
+      </div>
+      <div class="form-group">
+        <label for="noi_dung">Nội dung</label>
+        <textarea id="noiDung" name="NOI_DUNG" required></textarea>
+        <label for="ngay">Ngày sửa đổi:</label>
+        <input type="date" id="ngay" name="NGAY" required value="{{ today }}"><br>
+      </div>
+      <input type="submit" value="Submit" style="width:20%;">
+  <button type="button" onclick="setDefault()" style="border-radius:4px; padding: 10px 20px;">Reset</button>
+</form>
+  </div>
+</body>
+  </div>
+    <script>
+      console.log({{report['stt']}});
+      if (String({{report['stt']}}) === "") {
+        document.getElementById("stt").required = true;
+      }
+      else {
+        document.getElementById("stt").readOnly = true;
+      }
+      function setDefault() {
+          document.getElementById('stt').value = "{{report['stt']}}";
+          document.getElementById('noiDung').value = "";
+          document.getElementById('ngay').value = "{{ today }}";
+      }
+      function updateFormSTT() {
+        if ("{{report['func']}}"=='update'){
+          var stt = document.getElementById('stt').value;
+          fetch(`/api/getFormREPORT?stt=${stt}`)
+              .then(response => {
+                  if (!response.ok) {
+                    return response.json().then(errorData => {
+                                                        // Throw an error with the message from your Flask application
+                                                        throw new Error(errorData.error);
+                                                    });
+                  }
+                  return response.json();
+              })
+              .then(data => {
+                  document.getElementById('noiDung').value = data.noiDung;
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                alert(error.message);
+                document.getElementById('noiDung').value = '';
+                document.getElementById('stt').value = '';
+              });
+            }
+      }
+    </script>
+</html>

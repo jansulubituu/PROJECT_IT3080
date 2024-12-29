@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    {% include 'main_design/history_design.html' %}
+
+
+
+<!-- Bảng Thu Chi -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <h6 class="m-0 font-weight-bold text-primary">Quản lý Phí chưa đóng</h6>
+                  <div class="form-container">
+                    <input type="number" id="month" class="form-ngay" onchange="checkUnPaid()" placeholder="Tháng">
+                    <input type="number" id="year" class="form-ngay" onchange="checkUnPaid()" placeholder="Năm">
+                  </div>
+              </div>
+            </div>
+            <div class="card-body">
+                
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>ID dịch vụ</th>
+                                <th>Tên dịch vụ</th>
+                                <th>ID hộ</th>
+                                <th>Cần phải đóng</th>
+                                <th>Ngày</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody">
+                          
+                        </tbody>
+                    </table>
+                </div>
+                <script>
+                  // Example data from the database   
+                  var expenseData = JSON.parse('{{ user["data"] | tojson | safe }}');
+                  function insertDataToTable(data) {
+                    var dataTableBody = document.getElementById('dataTableBody');
+                    data.forEach(function(item) {
+                        var row = `<tr>
+                            <td>${item.ID_DICH_VU}</td>
+                            <td>${item.TEN_DICH_VU}</td>
+                            <td>${item.ID_HO}</td>
+                            <td>${item.CAN_PHAI_DONG}</td>
+                            <td>${item.ngay}</td>
+                        </tr>`;
+                        dataTableBody.innerHTML += row;
+                    });
+                  }
+
+                  function deleteDataFromTable() {
+                    var dataTableBody = document.getElementById('dataTableBody');
+                    dataTableBody.innerHTML = '';
+                }
+                  // Call this function when you've retrieved your data from the database
+                  insertDataToTable(expenseData);
+                  </script>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Thêm script JavaScript để thực hiện chức năng tìm kiếm và lọc -->
+<script>
+    document.getElementById("incomeExpenseSearchInput").addEventListener("keyup", function () {
+        filterdataTable();
+    });
+
+    document.getElementById("incomeExpenseFilterSelect").addEventListener("change", function () {
+        filterdataTable();
+    });
+
+    function filterdataTable() {
+        var input, filter, table, tr, td, i, txtValue, filterValue;
+        input = document.getElementById("incomeExpenseSearchInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("dataTable");
+        tr = table.getElementsByTagName("tr");
+        filterValue = document.getElementById("incomeExpenseFilterSelect").value;
+
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[getColumnIndex(filterValue)];
+            if (td) {
+                if (td.querySelector("input")) txtValue = td.querySelector("input").value;
+                else txtValue = td.textContent || td.innerText;
+
+                if ((filterValue === "all" || txtValue.toUpperCase().indexOf(filter) > -1)) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    function getColumnIndex(filterValue) {
+        switch (filterValue) {
+            case "ID_DICH_VU":
+                return 0;
+            case "TEN_DICH_VU":
+                return 1;
+            case "ID_HO":
+                return 2;
+            case "CAN_PHAI_DONG":
+                return 4;
+            case "ngay":
+                return 5;
+            default:
+                return 0;
+        }
+    }
+
+    function checkUnPaid() {
+        var month = document.getElementById('month').value;
+        var year = document.getElementById('year').value;
+        if (month && year){
+            fetch(`/api/checkUnPaid?year=${year}&month=${month}`)
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(errorData => {
+                                                        // Throw an error with the message from your Flask application
+                                                        throw new Error(errorData.error);
+                                                    });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    deleteDataFromTable()
+                    insertDataToTable(data.data); // Update the price
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(error.message);
+                    document.getElementById('month').value = '';
+                    document.getElementById('year').value = '';
+                });
+        }
+    }
+</script>
+<script src="{{url_for('static', filename='js/multi_search.js')}}"></script>

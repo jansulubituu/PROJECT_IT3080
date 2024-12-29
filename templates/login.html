@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <form action="/api/login" method="post" onsubmit="handleLogin(event)">
+  <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <meta name="description" content="">
+      <meta name="author" content="">
+  
+      <title>Đăng nhập</title>
+      
+  
+      <!-- Custom fonts for this template-->
+      <!--<link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">-->
+      <link
+          href="{{ url_for('static', filename='css/style_admin.css') }}"
+          rel="stylesheet">
+  
+      <!-- Custom styles for this template-->
+      <!--<link href="css/sb-admin-2.min.css" rel="stylesheet">-->
+      
+  </head>
+  
+  <body class="bg-gradient-primary">
+  
+      <div class="container">
+  
+          <!-- Outer Row -->
+          <div class="row justify-content-center">
+  
+              <div class="col-xl-10 col-lg-12 col-md-9">
+  
+                  <div class="card o-hidden border-0 shadow-lg my-5">
+                      <div class="card-body p-0">
+                          <!-- Nested Row within Card Body -->
+                          <div class="row">
+                              <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+                              <div class="col-lg-6">
+                                  <div class="p-5">
+                                      <div class="text-center">
+                                          <h1 class="h4 text-gray-900 mb-4">QLCC</h1>
+                                      </div>
+                                      <form class="user">
+                                          <div class="form-group">
+                                                <span class="form-control-icon"><ion-icon name="person-circle"></ion-icon></span>
+                                              <input type="text" class="form-control form-control-user"
+                                                  id="exampleInputEmail" aria-describedby="emailHelp"
+                                                  name="username"
+                                                  placeholder="Username">
+                                          </div>
+                                          <div class="form-group">
+                                                <span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
+                                              <input type="password" class="form-control form-control-user"
+                                                  id="exampleInputPassword" name='password' placeholder="Password">
+                                          </div>
+                                          <div class="form-group">
+                                              <div class="custom-control custom-checkbox small">
+                                                  <input type="checkbox" class="custom-control-input" id="customCheck" onclick = "showpass()">
+                                                  <label class="custom-control-label" for="customCheck">Hiện mật khẩu</label>
+                                              </div>
+                                          </div>
+                                          <button type='submit' class="btn btn-primary btn-user btn-block">
+                                              Đăng nhập
+                                          </button> 
+                                          <!-- <p id="error_message" style="color: red;"></p> -->
+                                          <hr>   
+                                        <script>
+                                          function showpass() {
+                                            var x = document.getElementById("exampleInputPassword");
+                                            x.type = x.type === "password" ? "text" : "password";
+                                          };
+                                          function handleLogin(event) {
+                                            event.preventDefault(); // Prevent the default form submission
+
+                                            var username = document.getElementById('exampleInputEmail').value;
+                                            var password = document.getElementById('exampleInputPassword').value;
+
+                                            fetch('/api/login', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                },
+                                                body: JSON.stringify({username: username, password: password}),
+                                            })
+                                            .then(response => {
+                                                if (!response.ok) {
+                                                    // If the response is not ok, throw an error with the status text
+                                                    return response.json().then(errorData => {
+                                                        // Throw an error with the message from your Flask application
+                                                        throw new Error(errorData.error);
+                                                    });
+                                                }
+                                                return response.json();  // Parse the JSON in the response
+                                            })
+                                            .then(data => {
+                                                if (data.error) {
+                                                    // If there's an error, display it
+                                                    document.getElementById('error_message').textContent = data.error;
+                                                } else {
+                                                    // If login is successful, redirect or do something else
+                                                    window.location.href = data.redirect;
+                                                }
+                                            })
+                                            .catch((error) => {
+                                                console.error('Error:', error);
+                                                alert('Login failed: ' + error.message);
+                                            });
+                                        }
+                                        </script>
+                                        </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  </body>
+  </form>
+</html>

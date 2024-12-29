@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  {% set user_design = 'main_design/' ~ user['user'] ~ '_design.html' %}
+  {% include user_design %}
+
+
+
+<!-- Bảng Thu Chi -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <h6 class="m-0 font-weight-bold text-primary">Quản lý Thu Chi</h6>
+                  <!-- <button type="button" class="btn btn-primary" name="Chưa thu" id="changeMode">Đã Thu</button> -->
+              </div>
+            </div>
+            <div class="card-body">
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Số thứ tự</th>
+                                <th>ID dịch vụ</th>
+                                <th>ID hộ</th>
+                                <th>Số lượng</th>
+                                <th>Giá tiền</th>
+                                <th>Đã thu</th>
+                                <th>Ngày thu</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody">
+                          
+                        </tbody>
+                    </table>
+                </div>
+                <script>
+                  // Example data from the database   
+                  var expenseData = JSON.parse('{{ user["data"] | tojson | safe }}');
+                  // var dataTable = ["", ""];
+                  // var currentData = 0;
+                  function insertDataToTable(data) {
+                    var dataTableBody = document.getElementById('dataTableBody');
+                    data.forEach(function(item) {
+                        var row = `<tr>
+                            <td>${item.STT}</td>
+                            <td>${item.ID_DICH_VU}</td>
+                            <td>${item.ID_HO}</td>
+                            <td>${item.SO_LUONG}</td>
+                            <td>${item.GIA_TIEN}</td>
+                            <td>${item.DA_THU}</td>
+                            <td>${item.ngay_thu}</td>
+                        </tr>`;
+                        // console.log(item);
+                        // dataTable[item.GIA_TIEN > item.DA_THU ? 0 : 1] += row;
+                        dataTableBody.innerHTML += row;
+                    });
+                  }
+                  // Call this function when you've retrieved your data from the database
+                  insertDataToTable(expenseData);
+                  // $("#dataTableBody").html(dataTable[currentData]);
+                  </script>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Thêm script JavaScript để thực hiện chức năng tìm kiếm và lọc -->
+<script>
+    document.getElementById("incomeExpenseSearchInput").addEventListener("keyup", function () {
+        filterdataTable();
+    });
+
+    document.getElementById("incomeExpenseFilterSelect").addEventListener("change", function () {
+        filterdataTable();
+    });
+
+    function filterdataTable() {
+        var input, filter, table, tr, td, i, txtValue, filterValue;
+        input = document.getElementById("incomeExpenseSearchInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("dataTable");
+        tr = table.getElementsByTagName("tr");
+        filterValue = document.getElementById("incomeExpenseFilterSelect").value;
+
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[getColumnIndex(filterValue)];
+            if (td) {
+                if (td.querySelector("input")) txtValue = td.querySelector("input").value;
+                else txtValue = td.textContent || td.innerText;
+
+                if ((filterValue === "all" || txtValue.toUpperCase().indexOf(filter) > -1)) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    function getColumnIndex(filterValue) {
+        switch (filterValue) {
+            case "STT":
+                return 0;
+            case "ID_DICH_VU":
+                return 1;
+            case "ID_HO":
+                return 2;
+            case "SO_LUONG":
+                return 3;
+            case "GIA_TIEN":
+                return 4;
+            case "DA_THU":
+                return 5;
+            case "ngay_thu":
+                return 6;
+            default:
+                return 0;
+        }
+    }
+</script>
+<script src="{{url_for('static', filename='js/multi_search.js')}}"></script>

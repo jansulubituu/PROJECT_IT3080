@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  {% set user_design = 'main_design/' ~ user['user'] ~ '_design.html' %}
+  {% include user_design %}
+
+<!-- Bảng Hộ khẩu -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Quản Lý Dịch vụ</h6>
+            </div>
+            <div class="card-body">
+                
+                    <div class="table-responsive">
+                      <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                          <thead>
+                              <tr>
+                                  <th>ID Dịch Vụ</th>
+                                  <th>Tên Dịch Vụ</th>
+                                  <th>Đơn Giá</th>
+                                  <th>Bắt Buộc</th>
+                                  <th>Tính theo diện tích</th>
+                                  <th>Hiện hành </th>
+                              </tr>
+                          </thead>
+                          <tbody id="tableBody">
+                              <!-- Data rows will be inserted here -->
+                          </tbody>
+                      </table>
+                    </div>
+
+                    <script>
+                    // Example data from the database   
+                    var serviceData = JSON.parse('{{ user["data"] | tojson | safe }}');
+
+                    function insertDataToTable(data) {
+                      var tableBody = document.getElementById('tableBody');
+                      data.forEach(function(item) {
+                          var row = `<tr>
+                              <td>${item.ID_DICH_VU}</td>
+                              <td>${item.TEN_DICH_VU}</td>
+                              <td>${item.don_gia}</td>
+                              <td>${item.BAT_BUOC}</td>
+                              <td>${item.TINH}</td>
+                              <td>${item.HIEN_HANH === 1 ? "Có" : "Không"}</td>
+                          </tr>`;
+                          tableBody.innerHTML += row;
+                      });
+                    }
+
+                    // Call this function when you've retrieved your data from the database
+                    insertDataToTable(serviceData);
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+  <script>
+      document.getElementById("serviceSearchInput").addEventListener("keyup", function () {
+          filterServiceTable();
+      });
+
+      document.getElementById("serviceSearchInput").addEventListener("change", function () {
+          filterServiceTable();
+      });
+
+      function filterServiceTable() {
+          var input, filter, table, tr, td, i, txtValue, filterValue;
+          input = document.getElementById("serviceSearchInput");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("dataTable");
+          tr = table.getElementsByTagName("tr");
+          filterValue = document.getElementById("serviceFilterSelect").value;
+
+          for (i = 0; i < tr.length; i++) {
+              td = tr[i].getElementsByTagName("td")[getColumnIndex(filterValue)];
+              if (td) {
+                  txtValue = td.textContent || td.innerText;
+
+                  if ((filterValue === "all" || txtValue.toUpperCase().indexOf(filter) > -1)) {
+                      tr[i].style.display = "";
+                  } else {
+                      tr[i].style.display = "none";
+                  }
+              }
+          }
+      }
+
+      function getColumnIndex(filterValue) {
+          switch (filterValue) {
+              case "idDichVu":
+                  return 0;
+              case "tenDichVu":
+                  return 1;
+              case "donGia":
+                  return 2;
+              case "batBuoc":
+                  return 3;
+              case "tinh":
+                  return 4;
+            case "hienHanh":
+                return 5;
+              default:
+                  return 0;
+          }
+      }
+  </script>
+<script src="{{url_for('static', filename='js/multi_search.js')}}"></script>
+</div>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <form action="/api/NK/{{nhankhau['func']}}/apply" method="post">
+        <head>
+            <title>{{nhankhau['form_name']}}</title>
+            <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_form_nhankhau.css') }}">
+        </head>
+        <body>
+          <div class="form-container">
+            <form id="registrationForm">
+                <h2>{{nhankhau['title']}}</h2>
+                <label for="stt">STT:</label>
+                <input type="number" id="stt" name="stt" readonly value="{{nhankhau['stt']}}"><br>
+                <label for="cccd">CCCD:</label>
+                <input type="text" id="cccd" name="CCCD" required onchange="updateFormCCCD()"><br>
+                <label for="hoTen">Họ và Tên:</label>
+                <input type="text" id="hoTen" name="HO_TEN" required><br>
+                <label for="ngaySinh">Ngày Sinh:</label>
+                <input type="date" id="ngaySinh" name="NGAY_SINH" required><br>
+                <label for="quanHe">Quan Hệ:</label>
+                <input type="text" id="quanHe" name="QUAN_HE"><br>
+                <label for="tinhTrangCuTru">Tình Trạng Cư Trú:</label>
+                <select id="tinhTrangCuTru" name="TINH_TRANG_CU_TRU">
+                    <option value="Yes">Thường trú</option>
+                    <option value="No">Tạm trú</option>
+                </select><br>
+                <label for="idHo">ID Hộ:</label>
+                <input type="text" id="idHo" name="ID_HO"><br>
+                <label for="ngaySuaDoi">Ngày sửa đổi:</label>
+                <input type="date" id="ngaySuaDoi" name="NGAY_SUA_DOI" required value="{{ today }}"><br>
+                <button type="submit">Gửi</button>
+            </form>
+            <!-- <button type="button" onclick="setDefault()">Reset to Default</button> -->
+          </div>
+            <script>
+              function setDefault() {
+                  document.getElementById('stt').value = "{{nhankhau['stt']}}";
+                  document.getElementById('ngaySuaDoi').value = "{{ today }}";
+              }
+            function updateFormCCCD() {
+              if ("{{nhankhau['func']}}"=='update'){
+                var cccd = document.getElementById('cccd').value;
+                fetch(`/api/getFormCCCD?cccd=${cccd}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(errorData => {
+                                                        // Throw an error with the message from your Flask application
+                                                        throw new Error(errorData.error);
+                                                    });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        document.getElementById('hoTen').value = data.hoTen;
+                        document.getElementById('ngaySinh').value = data.ngaySinh;
+                        document.getElementById('quanHe').value = data.quanHe;
+                        document.getElementById('tinhTrangCuTru').value = data.tinhTrangCuTru;
+                        document.getElementById('idHo').value = data.idHo;
+                    })
+                    .catch(error => {
+                      console.error('Error:', error);
+                      alert(error.message);
+                      document.getElementById('hoTen').value = ''; 
+                      document.getElementById('ngaySinh').value = '';
+                      document.getElementById('quanHe').value = '';
+                      document.getElementById('tinhTrangCuTru').value = '';
+                      document.getElementById('idHo').value = '';
+                    });
+                  }
+            }
+
+          </script>
+        </body>
+</form>
+</html>

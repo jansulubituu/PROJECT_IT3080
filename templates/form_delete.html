@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <form action="/{{format['class']}}/delete/apply" method="post">
+    <meta charset="UTF-8">
+    <title>{{format['title']}}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_form_nhankhau.css') }}">
+</head>
+<body>
+    <div class="form-container">
+        <form id="FormDelete">
+          <div class="form-group">
+            <label for="numberInput">{{format['label']}}</label>
+            <input type="number" id="{{format['name']}}" name="{{format['name']}}" required>
+            <label for="ngayThayDoi">Ngày Thay Đổi:</label>
+            <input type="date" id="ngayThayDoi" name="NGAY_THAY_DOI" required value="{{ today }}"><br>
+            <button type="submit">Gửi</button>
+          </div>
+        </form>
+        <!-- <button type="button" onclick="setDefault()">Reset to Default</button> -->
+      </div>
+        <script>
+          function setDefault() {
+              document.getElementById('ngayThayDoi').value = "{{ today }}";
+          }
+      </script>
+    </body>
+</html>
